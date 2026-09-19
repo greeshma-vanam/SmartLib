@@ -1,17 +1,26 @@
 package smartlib.ui;
 
+import smartlib.service.BookManager;
+import smartlib.service.IssueManager;
+import smartlib.service.StudentManager;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner;
+    private BookManager bookManager;
+    private StudentManager studentManager;
+    private IssueManager issueManager;
 
-    // Constructor to initialize the Scanner object
     public Menu() {
         this.scanner = new Scanner(System.in);
+        // Shared instances across the application
+        this.bookManager = new BookManager();
+        this.studentManager = new StudentManager();
+        this.issueManager = new IssueManager(bookManager, studentManager);
     }
 
-    // Method to display the loop and handle choices
     public void displayMenu() {
         int choice = 0;
 
@@ -23,21 +32,19 @@ public class Menu {
 
             if (choice != 9) {
                 System.out.println("\nPress Enter to continue...");
-                scanner.nextLine(); // Wait for user acknowledgment
+                scanner.nextLine();
             }
         } while (choice != 9);
 
         scanner.close();
     }
 
-    // Displays the project header
     private void printHeader() {
         System.out.println("==================================================");
         System.out.println("      SMARTLIB – SMART LIBRARY MANAGEMENT SYSTEM");
         System.out.println("==================================================\n");
     }
 
-    // Displays the main menu options
     private void printOptions() {
         System.out.println("1. Book Management");
         System.out.println("2. Student Management");
@@ -51,36 +58,35 @@ public class Menu {
         System.out.print("\nEnter your choice (1-9): ");
     }
 
-    // Handles user input and guards against non-integer inputs
     private int getChoice() {
         int choice = -1;
         try {
             choice = scanner.nextInt();
         } catch (InputMismatchException e) {
             System.out.println("\n[Error] Invalid input! Please enter a number between 1 and 9.");
-            choice = -1; // Keeps choice invalid to re-prompt
+            choice = -1;
         } finally {
-            scanner.nextLine(); // Clear the input buffer
+            scanner.nextLine();
         }
         return choice;
     }
 
-    // Routes the user selection to placeholders or submenus
     private void handleChoice(int choice) {
         System.out.println("\n--------------------------------------------------");
         switch (choice) {
             case 1:
-                BookMenu bookMenu = new BookMenu(scanner);
+                BookMenu bookMenu = new BookMenu(scanner, bookManager);
                 bookMenu.displayBookMenu();
                 break;
             case 2:
-                System.out.println("[Selected] Student Management (Placeholder)");
+                StudentMenu studentMenu = new StudentMenu(scanner, studentManager);
+                studentMenu.displayStudentMenu();
                 break;
             case 3:
-                System.out.println("[Selected] Issue Book (Placeholder)");
+                handleIssueBook();
                 break;
             case 4:
-                System.out.println("[Selected] Return Book (Placeholder)");
+                handleReturnBook();
                 break;
             case 5:
                 System.out.println("[Selected] Search (Placeholder)");
@@ -101,5 +107,34 @@ public class Menu {
                 System.out.println("[Error] Invalid choice. Please select an option between 1 and 9.");
         }
         System.out.println("--------------------------------------------------");
+    }
+
+    // Option 3: Issue Book Handler
+    private void handleIssueBook() {
+        System.out.println("               ISSUE BOOK TO STUDENT");
+        System.out.println("--------------------------------------------------");
+        System.out.print("Enter Book ID: ");
+        String bookId = scanner.nextLine().trim();
+
+        System.out.print("Enter Student ID: ");
+        String studentId = scanner.nextLine().trim();
+
+        boolean success = issueManager.issueBook(bookId, studentId);
+        if (success) {
+            System.out.println("\n[Success] Book successfully issued to student " + studentId + "!");
+        }
+    }
+
+    // Option 4: Return Book Handler
+    private void handleReturnBook() {
+        System.out.println("                 RETURN BOOK");
+        System.out.println("--------------------------------------------------");
+        System.out.print("Enter Book ID to return: ");
+        String bookId = scanner.nextLine().trim();
+
+        boolean success = issueManager.returnBook(bookId);
+        if (success) {
+            System.out.println("\n[Success] Book returned successfully and is now available!");
+        }
     }
 }

@@ -10,9 +10,9 @@ public class BookMenu {
     private Scanner scanner;
     private BookManager bookManager;
 
-    public BookMenu(Scanner scanner) {
+    public BookMenu(Scanner scanner, BookManager bookManager) {
         this.scanner = scanner;
-        this.bookManager = new BookManager();
+        this.bookManager = bookManager; // Use shared instance
     }
 
     public void displayBookMenu() {
@@ -35,7 +35,7 @@ public class BookMenu {
                 scanner.nextLine(); // Clear buffer
             } catch (InputMismatchException e) {
                 System.out.println("\n[Error] Invalid input! Please enter a number between 1 and 7.");
-                scanner.nextLine(); // Clear invalid input
+                scanner.nextLine();
                 choice = 0;
                 continue;
             }
@@ -76,7 +76,7 @@ public class BookMenu {
 
     private void handleAddBook() {
         System.out.println("\n--- Add New Book ---");
-        System.out.print("Enter Book ID (e.g., B003): ");
+        System.out.print("Enter Book ID: ");
         String id = scanner.nextLine().trim();
         if (id.isEmpty()) {
             System.out.println("[Error] Book ID cannot be empty.");
@@ -96,47 +96,37 @@ public class BookMenu {
         if (success) {
             System.out.println("\n[Success] Book added successfully!");
         } else {
-            System.out.println("\n[Error] Book ID already exists! Cannot add duplicate.");
+            System.out.println("\n[Error] Book ID already exists!");
         }
     }
 
     private void handleSearchBook() {
         System.out.println("\n--- Search Book ---");
-        System.out.print("Enter Book ID or Title to search: ");
+        System.out.print("Enter Book ID or Title: ");
         String query = scanner.nextLine().trim();
-        if (query.isEmpty()) {
-            System.out.println("[Error] Search query cannot be empty.");
-            return;
+        if (!query.isEmpty()) {
+            bookManager.searchBook(query);
         }
-        bookManager.searchBook(query);
     }
 
     private void handleUpdateBook() {
-        System.out.println("\n--- Update Book Information ---");
+        System.out.println("\n--- Update Book ---");
         System.out.print("Enter Book ID to update: ");
         String id = scanner.nextLine().trim();
-
-        Book existing = bookManager.findBookById(id);
-        if (existing == null) {
+        Book b = bookManager.findBookById(id);
+        if (b == null) {
             System.out.println("[Error] Book ID not found.");
             return;
         }
-
-        System.out.println("Current details: " + existing);
-        System.out.print("Enter new Title (or press Enter to keep current): ");
+        System.out.print("Enter new Title (or press Enter to skip): ");
         String title = scanner.nextLine().trim();
-
-        System.out.print("Enter new Author (or press Enter to keep current): ");
+        System.out.print("Enter new Author (or press Enter to skip): ");
         String author = scanner.nextLine().trim();
-
-        System.out.print("Enter new Category (or press Enter to keep current): ");
+        System.out.print("Enter new Category (or press Enter to skip): ");
         String category = scanner.nextLine().trim();
 
-        boolean success = bookManager.updateBook(id, title, author, category);
-        if (success) {
+        if (bookManager.updateBook(id, title, author, category)) {
             System.out.println("\n[Success] Book updated successfully!");
-        } else {
-            System.out.println("\n[Error] Update failed.");
         }
     }
 
@@ -144,12 +134,10 @@ public class BookMenu {
         System.out.println("\n--- Delete Book ---");
         System.out.print("Enter Book ID to delete: ");
         String id = scanner.nextLine().trim();
-
-        boolean success = bookManager.deleteBook(id);
-        if (success) {
+        if (bookManager.deleteBook(id)) {
             System.out.println("\n[Success] Book deleted successfully!");
         } else {
-            System.out.println("\n[Error] Book ID not found.");
+            System.out.println("[Error] Book ID not found.");
         }
     }
 
@@ -157,14 +145,11 @@ public class BookMenu {
         System.out.println("\n--- Check Book Availability ---");
         System.out.print("Enter Book ID: ");
         String id = scanner.nextLine().trim();
-
         Book b = bookManager.findBookById(id);
         if (b != null) {
-            System.out.println("\n[Info] Book found:");
-            System.out.println("Title: " + b.getTitle());
             System.out.println("Status: " + (b.isAvailable() ? "Available" : "Issued"));
         } else {
-            System.out.println("\n[Error] Book ID not found.");
+            System.out.println("[Error] Book ID not found.");
         }
     }
 }
