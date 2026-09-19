@@ -8,14 +8,11 @@ public class StudentManager {
 
     public StudentManager() {
         students = new ArrayList<>();
-        // Pre-loaded sample students for easy testing
         students.add(new Student("S001", "Rahul Sharma", "CSE-AIML", "3rd", "rahul@smartlib.com"));
         students.add(new Student("S002", "Priya Verma", "CSE", "3rd", "priya@smartlib.com"));
     }
 
-    // Add a new student
     public boolean addStudent(String studentId, String name, String department, String year, String email) {
-        // Check for duplicate Student ID
         for (Student s : students) {
             if (s.getStudentId().equalsIgnoreCase(studentId)) {
                 return false;
@@ -25,7 +22,6 @@ public class StudentManager {
         return true;
     }
 
-    // View all students
     public void viewAllStudents() {
         if (students.isEmpty()) {
             System.out.println("\n[Info] No students registered in the system.");
@@ -40,7 +36,6 @@ public class StudentManager {
         System.out.println("----------------------------------------------------------------------------------");
     }
 
-    // Search student by ID or Name
     public void searchStudent(String query) {
         boolean found = false;
         System.out.println("\n----------------------------------------------------------------------------------");
@@ -58,7 +53,6 @@ public class StudentManager {
         System.out.println("----------------------------------------------------------------------------------");
     }
 
-    // Update student details
     public boolean updateStudent(String studentId, String newName, String newDept, String newYear, String newEmail) {
         for (Student s : students) {
             if (s.getStudentId().equalsIgnoreCase(studentId)) {
@@ -72,7 +66,6 @@ public class StudentManager {
         return false;
     }
 
-    // Delete a student by ID
     public boolean deleteStudent(String studentId) {
         for (int i = 0; i < students.size(); i++) {
             if (students.get(i).getStudentId().equalsIgnoreCase(studentId)) {
@@ -83,7 +76,6 @@ public class StudentManager {
         return false;
     }
 
-    // Find student object by ID
     public Student findStudentById(String studentId) {
         for (Student s : students) {
             if (s.getStudentId().equalsIgnoreCase(studentId)) {
@@ -91,5 +83,10 @@ public class StudentManager {
             }
         }
         return null;
+    }
+
+    // Dashboard helper method
+    public int getTotalStudentsCount() {
+        return students.size();
     }
 }

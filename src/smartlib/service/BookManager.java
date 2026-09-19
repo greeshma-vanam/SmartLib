@@ -8,14 +8,11 @@ public class BookManager {
 
     public BookManager() {
         books = new ArrayList<>();
-        // Pre-loaded sample books for easy testing
         books.add(new Book("B001", "Java Programming", "John Smith", "Education", true));
         books.add(new Book("B002", "Data Structures", "Alice Johnson", "Computer Science", true));
     }
 
-    // Add a new book
     public boolean addBook(String bookId, String title, String author, String category) {
-        // Check for duplicate Book ID
         for (Book b : books) {
             if (b.getBookId().equalsIgnoreCase(bookId)) {
                 return false; 
@@ -25,7 +22,6 @@ public class BookManager {
         return true;
     }
 
-    // View all books
     public void viewAllBooks() {
         if (books.isEmpty()) {
             System.out.println("\n[Info] No books found in the library.");
@@ -40,7 +36,6 @@ public class BookManager {
         System.out.println("----------------------------------------------------------------------------------");
     }
 
-    // Search book by ID or Title
     public void searchBook(String query) {
         boolean found = false;
         System.out.println("\n----------------------------------------------------------------------------------");
@@ -58,7 +53,6 @@ public class BookManager {
         System.out.println("----------------------------------------------------------------------------------");
     }
 
-    // Update book details
     public boolean updateBook(String bookId, String newTitle, String newAuthor, String newCategory) {
         for (Book b : books) {
             if (b.getBookId().equalsIgnoreCase(bookId)) {
@@ -71,7 +65,6 @@ public class BookManager {
         return false;
     }
 
-    // Delete a book by ID
     public boolean deleteBook(String bookId) {
         for (int i = 0; i < books.size(); i++) {
             if (books.get(i).getBookId().equalsIgnoreCase(bookId)) {
@@ -82,7 +75,6 @@ public class BookManager {
         return false;
     }
 
-    // Find and return a book object for availability checking or referencing
     public Book findBookById(String bookId) {
         for (Book b : books) {
             if (b.getBookId().equalsIgnoreCase(bookId)) {
@@ -90,5 +82,24 @@ public class BookManager {
             }
         }
         return null;
+    }
+
+    // Dashboard helper methods
+    public int getTotalBooksCount() {
+        return books.size();
+    }
+
+    public int getAvailableBooksCount() {
+        int count = 0;
+        for (Book b : books) {
+            if (b.isAvailable()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getIssuedBooksCount() {
+        return getTotalBooksCount() - getAvailableBooksCount();
     }
 }

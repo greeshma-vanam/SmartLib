@@ -88,13 +88,15 @@ public class Menu {
                 handleReturnBook();
                 break;
             case 5:
-                System.out.println("[Selected] Search (Placeholder)");
+                SearchMenu searchMenu = new SearchMenu(scanner, bookManager, studentManager);
+                searchMenu.displaySearchMenu();
                 break;
             case 6:
-                System.out.println("[Selected] Reports (Placeholder)");
+                ReportsMenu reportsMenu = new ReportsMenu(scanner, bookManager, studentManager, issueManager);
+                reportsMenu.displayReportsMenu();
                 break;
             case 7:
-                System.out.println("[Selected] Dashboard (Placeholder)");
+                handleDashboard();
                 break;
             case 8:
                 System.out.println("[Selected] AI Chatbot (Placeholder)");
@@ -127,5 +129,16 @@ public class Menu {
         String bookId = scanner.nextLine().trim();
 
         issueManager.returnBook(bookId);
+    }
+
+    // Dashboard Handler (Option 7)
+    private void handleDashboard() {
+        System.out.println("                   LIBRARY DASHBOARD");
+        System.out.println("--------------------------------------------------");
+        System.out.println("Total Books     : " + bookManager.getTotalBooksCount());
+        System.out.println("Available Books : " + bookManager.getAvailableBooksCount());
+        System.out.println("Issued Books    : " + bookManager.getIssuedBooksCount());
+        System.out.println("Total Students  : " + studentManager.getTotalStudentsCount());
+        System.out.println("--------------------------------------------------");
     }
 }

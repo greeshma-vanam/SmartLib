@@ -19,7 +19,6 @@ public class IssueManager {
         this.studentManager = studentManager;
     }
 
-    // Issue Book Logic
     public boolean issueBook(String bookId, String studentId) {
         Book book = bookManager.findBookById(bookId);
         if (book == null) {
@@ -45,7 +44,6 @@ public class IssueManager {
         return true;
     }
 
-    // Return Book & Fine Calculation Logic
     public boolean returnBook(String bookId) {
         Book book = bookManager.findBookById(bookId);
         if (book == null) {
@@ -58,7 +56,6 @@ public class IssueManager {
             return false;
         }
 
-        // Find corresponding issue record
         IssueRecord targetRecord = null;
         int targetIndex = -1;
         for (int i = 0; i < issueRecords.size(); i++) {
@@ -77,21 +74,17 @@ public class IssueManager {
         LocalDate issueDate = targetRecord.getIssueDate();
         LocalDate returnDate = LocalDate.now();
 
-        // Calculate days kept using ChronoUnit
         long daysKept = ChronoUnit.DAYS.between(issueDate, returnDate);
         if (daysKept < 0) {
-            daysKept = 0; // Safety guard
+            daysKept = 0;
         }
 
-        // Calculate late days and fine (₹5 per day after 7 days)
         long lateDays = daysKept > 7 ? daysKept - 7 : 0;
         long fineAmount = lateDays * 5;
 
-        // Perform return operation
         book.setAvailable(true);
         issueRecords.remove(targetIndex);
 
-        // Display detailed return and fine summary
         System.out.println("\n--------------------------------------------------");
         System.out.println("                 RETURN & FINE SUMMARY");
         System.out.println("--------------------------------------------------");
@@ -107,5 +100,10 @@ public class IssueManager {
         System.out.println("--------------------------------------------------");
 
         return true;
+    }
+
+    // Getter for Reports Module
+    public ArrayList<IssueRecord> getIssueRecords() {
+        return issueRecords;
     }
 }
