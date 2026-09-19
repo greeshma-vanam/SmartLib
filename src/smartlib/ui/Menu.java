@@ -15,7 +15,6 @@ public class Menu {
 
     public Menu() {
         this.scanner = new Scanner(System.in);
-        // Shared instances across the application
         this.bookManager = new BookManager();
         this.studentManager = new StudentManager();
         this.issueManager = new IssueManager(bookManager, studentManager);
@@ -109,7 +108,6 @@ public class Menu {
         System.out.println("--------------------------------------------------");
     }
 
-    // Option 3: Issue Book Handler
     private void handleIssueBook() {
         System.out.println("               ISSUE BOOK TO STUDENT");
         System.out.println("--------------------------------------------------");
@@ -119,22 +117,15 @@ public class Menu {
         System.out.print("Enter Student ID: ");
         String studentId = scanner.nextLine().trim();
 
-        boolean success = issueManager.issueBook(bookId, studentId);
-        if (success) {
-            System.out.println("\n[Success] Book successfully issued to student " + studentId + "!");
-        }
+        issueManager.issueBook(bookId, studentId);
     }
 
-    // Option 4: Return Book Handler
     private void handleReturnBook() {
         System.out.println("                 RETURN BOOK");
         System.out.println("--------------------------------------------------");
         System.out.print("Enter Book ID to return: ");
         String bookId = scanner.nextLine().trim();
 
-        boolean success = issueManager.returnBook(bookId);
-        if (success) {
-            System.out.println("\n[Success] Book returned successfully and is now available!");
-        }
+        issueManager.returnBook(bookId);
     }
 }

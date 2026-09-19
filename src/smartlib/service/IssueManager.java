@@ -4,6 +4,8 @@ import smartlib.model.Book;
 import smartlib.model.IssueRecord;
 import smartlib.model.Student;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class IssueManager {
@@ -19,57 +21,91 @@ public class IssueManager {
 
     // Issue Book Logic
     public boolean issueBook(String bookId, String studentId) {
-        // 1. Check if book exists
         Book book = bookManager.findBookById(bookId);
         if (book == null) {
             System.out.println("[Error] Book ID does not exist in the library.");
             return false;
         }
 
-        // 2. Check if student exists
         Student student = studentManager.findStudentById(studentId);
         if (student == null) {
             System.out.println("[Error] Student ID does not exist in the system.");
             return false;
         }
 
-        // 3. Check if book is available
         if (!book.isAvailable()) {
             System.out.println("[Error] Book is already issued to another student.");
             return false;
         }
 
-        // 4. Perform issue operation
         book.setAvailable(false);
-        issueRecords.add(new IssueRecord(bookId, studentId, "ISSUED"));
+        IssueRecord record = new IssueRecord(bookId, studentId, "ISSUED");
+        issueRecords.add(record);
+        System.out.println("[Info] Book issued successfully on: " + record.getIssueDate());
         return true;
     }
 
-    // Return Book Logic
+    // Return Book & Fine Calculation Logic
     public boolean returnBook(String bookId) {
-        // 1. Check if book exists
         Book book = bookManager.findBookById(bookId);
         if (book == null) {
             System.out.println("[Error] Book ID does not exist in the library.");
             return false;
         }
 
-        // 2. Check if book is currently issued
         if (book.isAvailable()) {
             System.out.println("[Error] This book is already available in the library (not currently issued).");
             return false;
         }
 
-        // 3. Perform return operation
-        book.setAvailable(true);
-        
-        // Remove active issue record
+        // Find corresponding issue record
+        IssueRecord targetRecord = null;
+        int targetIndex = -1;
         for (int i = 0; i < issueRecords.size(); i++) {
             if (issueRecords.get(i).getBookId().equalsIgnoreCase(bookId)) {
-                issueRecords.remove(i);
+                targetRecord = issueRecords.get(i);
+                targetIndex = i;
                 break;
             }
         }
+
+        if (targetRecord == null) {
+            System.out.println("[Error] No active issue record found for this Book ID.");
+            return false;
+        }
+
+        LocalDate issueDate = targetRecord.getIssueDate();
+        LocalDate returnDate = LocalDate.now();
+
+        // Calculate days kept using ChronoUnit
+        long daysKept = ChronoUnit.DAYS.between(issueDate, returnDate);
+        if (daysKept < 0) {
+            daysKept = 0; // Safety guard
+        }
+
+        // Calculate late days and fine (₹5 per day after 7 days)
+        long lateDays = daysKept > 7 ? daysKept - 7 : 0;
+        long fineAmount = lateDays * 5;
+
+        // Perform return operation
+        book.setAvailable(true);
+        issueRecords.remove(targetIndex);
+
+        // Display detailed return and fine summary
+        System.out.println("\n--------------------------------------------------");
+        System.out.println("                 RETURN & FINE SUMMARY");
+        System.out.println("--------------------------------------------------");
+        System.out.println("Issue Date     : " + issueDate);
+        System.out.println("Return Date    : " + returnDate);
+        System.out.println("Days Kept      : " + daysKept);
+        System.out.println("Late Days      : " + lateDays);
+        if (fineAmount > 0) {
+            System.out.println("Fine Amount    : Rs." + fineAmount);
+        } else {
+            System.out.println("Fine Amount    : Rs.0");
+        }
+        System.out.println("--------------------------------------------------");
+
         return true;
     }
 }
