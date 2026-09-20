@@ -1,5 +1,6 @@
 package smartlib.ui;
 
+import smartlib.model.User;
 import smartlib.service.BookManager;
 import smartlib.service.IssueManager;
 import smartlib.service.StudentManager;
@@ -9,12 +10,14 @@ import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner;
+    private User currentUser;
     private BookManager bookManager;
     private StudentManager studentManager;
     private IssueManager issueManager;
 
-    public Menu() {
-        this.scanner = new Scanner(System.in);
+    public Menu(Scanner scanner, User currentUser) {
+        this.scanner = scanner;
+        this.currentUser = currentUser;
         this.bookManager = new BookManager();
         this.studentManager = new StudentManager();
         this.issueManager = new IssueManager(bookManager, studentManager);
@@ -41,7 +44,9 @@ public class Menu {
     private void printHeader() {
         System.out.println("==================================================");
         System.out.println("      SMARTLIB – SMART LIBRARY MANAGEMENT SYSTEM");
-        System.out.println("==================================================\n");
+        System.out.println("==================================================");
+        System.out.println(" Logged in as: " + currentUser.getUsername() + " | Role: " + currentUser.getRole());
+        System.out.println("--------------------------------------------------\n");
     }
 
     private void printOptions() {
@@ -72,6 +77,22 @@ public class Menu {
 
     private void handleChoice(int choice) {
         System.out.println("\n--------------------------------------------------");
+
+        // Role-based access control rules
+        String role = currentUser.getRole();
+
+        if (role.equals("STUDENT")) {
+            // Students are restricted from administrative/management modules
+            if (choice == 1 || choice == 2 || choice == 3 || choice == 4 || choice == 6) {
+                System.out.println("[Access Denied] Your role (" + role + ") does not have permission to access this module.");
+                System.out.println("--------------------------------------------------");
+                return;
+            }
+        } else if (role.equals("LIBRARIAN")) {
+            // Librarians can manage books, students, issues, returns, reports, dashboard, search, chatbot
+            // (Full standard operational access)
+        }
+
         switch (choice) {
             case 1:
                 BookMenu bookMenu = new BookMenu(scanner, bookManager);
@@ -131,7 +152,6 @@ public class Menu {
         issueManager.returnBook(bookId);
     }
 
-    // Dashboard Handler (Option 7)
     private void handleDashboard() {
         System.out.println("                   LIBRARY DASHBOARD");
         System.out.println("--------------------------------------------------");
