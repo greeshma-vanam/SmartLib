@@ -2,3 +2,5 @@
 bin/
 .vscode/
 smartlib.db
+.env
+target/

@@ -304,4 +304,43 @@ public class BookManager {
         }
         return 0;
     }
+public ArrayList<Book> getAllBooks() {
+    ArrayList<Book> books = new ArrayList<>();
+
+    Connection conn = DatabaseConnection.getConnection();
+
+    if (conn == null) {
+        return books;
+    }
+
+    String sql = "SELECT * FROM books";
+
+    try (Statement stmt = conn.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)) {
+
+        while (rs.next()) {
+            Book book = new Book(
+                rs.getString("book_id"),
+                rs.getString("title"),
+                rs.getString("author"),
+                rs.getString("category"),
+                rs.getInt("is_available") == 1
+            );
+
+            books.add(book);
+        }
+
+    } catch (SQLException e) {
+        System.out.println("[Database Error] Failed to retrieve books: " + e.getMessage());
+    } finally {
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            // Ignore close exception
+        }
+    }
+
+    return books;
+}
+
 }
