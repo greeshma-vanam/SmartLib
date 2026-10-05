@@ -258,4 +258,53 @@ public class StudentManager {
         }
         return 0;
     }
+        public ArrayList<Student> getAllStudents() {
+
+        ArrayList<Student> students = new ArrayList<>();
+
+        Connection conn = DatabaseConnection.getConnection();
+
+        if (conn == null) {
+            return students;
+        }
+
+        String sql = "SELECT * FROM students";
+
+        try (
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)
+        ) {
+
+            while (rs.next()) {
+
+                Student student = new Student(
+                        rs.getString("student_id"),
+                        rs.getString("name"),
+                        rs.getString("department"),
+                        rs.getString("year"),
+                        rs.getString("email")
+                );
+
+                students.add(student);
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "[Database Error] Failed to retrieve students: "
+                    + e.getMessage()
+            );
+
+        } finally {
+
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                // Ignore close exception
+            }
+        }
+
+        return students;
+    }
+
 }
